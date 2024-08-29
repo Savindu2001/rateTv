@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Currency Rates Management</title>
+    <style>
+        .currency-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .currency-item select,
+        .currency-item input {
+            margin-right: 10px;
+        }
+        .error {
+            color: red;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manage Currency Exchange Rates</h1>
+
+    <form id="ratesForm">
+        <div id="ratesContainer"></div>
+        <button type="button" onclick="addRateField()">Add New Currency</button>
+        <button type="submit">Save Rates</button>
+    </form>
+    <div id="error-message" class="error"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRates();
+        });
+
+        async function loadRates() {
+            try {
+                const response = await fetch('http://localhost:3001/api/rates');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch rates');
+                }
+                const rates = await response.json();
+                const ratesContainer = document.getElementById('ratesContainer');
+                rates.forEach((rate, index) => {
+                    addRateField(rate.currency, rate.buying, rate.selling, rate.flag, index);
+                });
+            } catch (error) {
+                document.getElementById('error-message').innerText = `Error loading rates: ${error.message}`;
+            }
+        }
+
+        function addRateField(currency = '', buying = '', selling = '', flag = '', index = Date.now()) {
+            const ratesContainer = document.getElementById('ratesContainer');
+            const flagOptions = getFlagOptions(flag);
+
+            const div = document.createElement('div');
+            div.className = 'currency-item';
+            div.setAttribute('data-index', index);
+            div.innerHTML = `
+                <select name="flag">
+                    ${flagOptions}
+                </select>
+                <input type="text" name="currency" value="${currency}" placeholder="Currency" required>
+                <input type="number" name="buying" value="${buying}" step="any" placeholder="Buying Rate" required>
+                <input type="number" name="selling" value="${selling}" step="any" placeholder="Selling Rate" required>
+                <button type="button" onclick="removeRateField(${index})">Remove</button>
+            `;
+
+            ratesContainer.appendChild(div);
+        }
+
+        function removeRateField(index) {
+            const div = document.querySelector(`[data-index="${index}"]`);
+            div.remove();
+        }
+
+        function getFlagOptions(selectedFlag) {
+            const flagMap = {
+                'USD': '🇺🇸', 'GBP': '🇬🇧', 'JPY': '🇯🇵', 'INR': '🇮🇳', 'EUR': '🇪🇺', 'CHF': '🇨🇭', 'AUD':'🇦🇺'
+                // Add more currencies and their corresponding flags
+            };
+
+            return Object.entries(flagMap).map(([code, emoji]) => `
+                <option value="${code}" ${code === selectedFlag ? 'selected' : ''}>${emoji} ${code}</option>
+            `).join('');
+        }
+
+        document.getElementById('ratesForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            document.getElementById('error-message').innerText = ''; // Clear previous errors
+
+            const rateDivs = document.querySelectorAll('#ratesContainer > div');
+            const rates = Array.from(rateDivs).map(div => {
+                const currency = div.querySelector('input[name="currency"]').value;
+                const buying = div.querySelector('input[name="buying"]').value;
+                const selling = div.querySelector('input[name="selling"]').value;
+                const flag = div.querySelector('select[name="flag"]').value;
+                return { currency, buying, selling, flag };
+            });
+
+            try {
+                const response = await fetch('http://localhost:3001/api/rates', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(rates)
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to save rates');
+                }
+                const result = await response.json();
+                alert(result.message);
+            } catch (error) {
+                document.getElementById('error-message').innerText = `Error saving rates: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>

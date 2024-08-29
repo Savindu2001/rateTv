@@ -1,0 +1,38 @@
+[
+  {
+    "currency": "USD",
+    "buying": "281.675",
+    "selling": "296.5",
+    "flag": "USD"
+  },
+  {
+    "currency": "GBP",
+    "buying": "372.286",
+    "selling": "391.88",
+    "flag": "GBP"
+  },
+  {
+    "currency": "AUD",
+    "buying": "190.209",
+    "selling": "200.22",
+    "flag": "AUD"
+  },
+  {
+    "currency": "CHF",
+    "buying": "333.089",
+    "selling": "350.62",
+    "flag": "CHF"
+  },
+  {
+    "currency": "JPY",
+    "buying": "1.938",
+    "selling": "2.04",
+    "flag": "JPY"
+  },
+  {
+    "currency": "EUR",
+    "buying": "313.158",
+    "selling": "329.64",
+    "flag": "EUR"
+  }
+]

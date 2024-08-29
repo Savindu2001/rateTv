@@ -1,0 +1,28 @@
+.landing-page {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.rates-section {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.ads-section {
+  flex: 1;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
